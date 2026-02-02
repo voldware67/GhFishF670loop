@@ -1,0 +1,546 @@
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+local Window = WindUI:CreateWindow({
+    Title = "Ray Hub",
+    Icon = "fish", -- lucide icon
+    Author = "By Cvoda blox",
+    Folder = "MyScEditSimple",
+    
+    -- ↓ This all is Optional. You can remove it.
+    Size = UDim2.fromOffset(580, 460),
+    MinSize = Vector2.new(560, 350),
+    MaxSize = Vector2.new(850, 560),
+    Transparent = true,
+    Theme = "Dark",
+    Resizable = true,
+    SideBarWidth = 200,
+    BackgroundImageTransparency = 0.42,
+    HideSearchBar = true,
+    ScrollBarEnabled = true,
+    
+    -- ↓ Optional. You can remove it.
+    --[[ You can set 'rbxassetid://' or video to Background.
+        'rbxassetid://':
+            Background = "rbxassetid://", -- rbxassetid
+        Video:
+            Background = "video:YOUR-RAW-LINK-TO-VIDEO.webm", -- video 
+    --]]
+    
+})
+
+Window:EditOpenButton({
+    Title = "Open",
+    Icon = "monitor",
+    CornerRadius = UDim.new(0,16),
+    StrokeThickness = 2,
+    Color = ColorSequence.new( -- gradient
+        Color3.fromHex("FF0F7B"), 
+        Color3.fromHex("F89B29")
+    ),
+    OnlyMobile = false,
+    Enabled = true,
+    Draggable = true,
+})
+
+Window:Tag({
+    Title = "Escape Tsunami For Fish",
+    Icon = "github",
+    Color = Color3.fromHex("#30ff6a"),
+    Radius = 0, -- from 0 to 13
+})
+
+local Tab = Window:Tab({
+    Title = "Credits",
+    Icon = "book", -- optional
+    Locked = false,
+})
+
+local Section = Tab:Section({ 
+    Title = "Made By Cvoda_blox",
+})
+
+local Button = Tab:Button({
+    Title = "Discord",
+    Color = Color3.fromHex("#0000FF"), -- paint the button
+    Justify = "Center", -- align items in the center (Center or Between or Left or Right)
+    IconAlign = "Left", -- Left or Right of the text
+    Icon = "thumbs-up", -- removing icon
+    Callback = function()
+        -- ...
+        
+        local link = "https://discord.gg/bZyMGmjqUe"
+
+if setclipboard then
+    setclipboard(link)
+end
+
+game.StarterGui:SetCore("SendNotification", {
+    Title = "Clipboard",
+    Text = "copy",
+    Duration = 3
+})
+        
+    end
+})
+
+local Button = Tab:Button({
+    Title = "YouTube",
+    Color = Color3.fromHex("#FF0000"), -- paint the button
+    Justify = "Center", -- align items in the center (Center or Between or Left or Right)
+    IconAlign = "Left", -- Left or Right of the text
+    Icon = "youtube", -- removing icon
+    Callback = function()
+        -- ...
+        
+        local link = "https://youtube.com/@cvoda_blox?si=9XkfTpBgl6u60Ijw"
+
+if setclipboard then
+    setclipboard(link)
+end
+
+game.StarterGui:SetCore("SendNotification", {
+    Title = "Clipboard",
+    Text = "copy",
+    Duration = 3
+})
+        
+    end
+})
+
+local Section = Tab:Section({ 
+    Title = "Update added another script and bug fixes",
+})
+
+local Tab = Window:Tab({
+    Title = "Main",
+    Icon = "shield-check", -- optional
+    Locked = false,
+})
+
+local Button = Tab:Button({
+    Title = "Remove tsunami",
+    Color = Color3.fromHex("#a2ff30"), -- paint the button
+    Justify = "Center", -- align items in the center (Center or Between or Left or Right)
+    IconAlign = "Left", -- Left or Right of the text
+    Icon = "trash-2", -- removing icon
+    Callback = function()
+        -- ...
+        
+        if workspace:FindFirstChild("Tsunamis") then
+    workspace.Tsunamis:Destroy()
+end
+        
+    end
+})
+
+local Button = Tab:Button({
+    Title = "Free vip",
+    Desc = "No Buy",
+    Locked = false,
+    Callback = function()
+        -- ...
+        
+        local vipFolder = workspace:WaitForChild("VIP")
+
+local function setNoClip(model)
+	for _, v in ipairs(model:GetDescendants()) do
+		if v:IsA("BasePart") then
+			v.CanCollide = false
+			v.CanTouch = false
+			v.CanQuery = false
+		end
+	end
+end
+
+for _, model in ipairs(vipFolder:GetChildren()) do
+	setNoClip(model)
+end
+
+vipFolder.ChildAdded:Connect(function(model)
+	task.wait(0.1)
+	setNoClip(model)
+end)
+        
+    end
+})
+
+local Button = Tab:Button({
+    Title = "Instant Proximity Prompt",
+    Desc = "No Time hold",
+    Locked = false,
+    Callback = function()
+        -- ...
+        
+for _, prom in next, workspace:GetDescendants() do
+  if prom:IsA("ProximityPrompt") then
+    prom.PromptButtonHoldBegan:Connect(function()
+       if prom.HoldDuration <= 0 then return end
+      fireproximityprompt(prom, 0)
+    end)
+  end
+end
+
+workspace.DescendantAdded:Connect(function(class)
+  if class:IsA("ProximityPrompt") then
+    class.PromptButtonHoldBegan:Connect(function()
+        if class.HoldDuration <= 0 then return end
+      fireproximityprompt(class, 0)
+    end)
+  end
+end)
+        
+    end
+})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local TELEPORT_POSITION = Vector3.new(22, 3, 11)
+local PROMPT_PATH = workspace 
+
+local Enabled = false
+local PromptConnections = {}
+
+local function TeleportPlayer()
+    local char = LocalPlayer.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        char.HumanoidRootPart.CFrame = CFrame.new(TELEPORT_POSITION)
+    end
+end
+
+local function ConnectPrompts()
+    for _, obj in pairs(PROMPT_PATH:GetDescendants()) do
+        if obj:IsA("ProximityPrompt") then
+            local conn = obj.Triggered:Connect(function(player)
+                if not Enabled then return end
+                if player ~= LocalPlayer then return end
+
+                task.wait(2) 
+                TeleportPlayer()
+            end)
+            table.insert(PromptConnections, conn)
+        end
+    end
+end
+
+local function DisconnectPrompts()
+    for _, conn in pairs(PromptConnections) do
+        conn:Disconnect()
+    end
+    table.clear(PromptConnections)
+end
+
+local Toggle = Tab:Toggle({
+    Title = "Auto Teleport Base",
+    Desc = "pick up Fish auto teleport base ",
+    Icon = "map-pin",
+    Type = "Checkbox",
+    Value = false,
+    Callback = function(state)
+        Enabled = state
+        if state then
+            ConnectPrompts()
+        else
+            DisconnectPrompts()
+        end
+    end
+})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local toggleTP = false
+local returnCFrame = CFrame.new(22, 3, 11)
+
+local Toggle = Tab:Toggle({
+    Title = "Teleport all random fish (fixed)",
+    Desc = "Teleport",
+    Value = false,
+    Callback = function(state)
+        toggleTP = state
+
+        task.spawn(function()
+            while toggleTP do
+                local char = LocalPlayer.Character
+                if not char or not char:FindFirstChild("HumanoidRootPart") then
+                    task.wait(1)
+                    continue
+                end
+
+                local hrp = char.HumanoidRootPart
+
+                for _, model in ipairs(workspace:GetDescendants()) do
+                    if not toggleTP then break end
+                    if not model:IsA("Model") then continue end
+
+                    local prompt = model:FindFirstChildOfClass("ProximityPrompt", true)
+                    if not prompt then continue end
+
+                    local part = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart", true)
+                    if not part then continue end
+
+                    hrp.CFrame = part.CFrame * CFrame.new(0, 0, -2)
+                    task.wait(0.3)
+
+                    fireproximityprompt(prompt)
+
+                    task.wait(0.5)
+
+                    hrp.CFrame = returnCFrame
+                    task.wait(1)
+                end
+            end
+        end)
+    end
+})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local tpToggle = false
+local selectedType = "Secret" -- default
+
+local returnPos = CFrame.new(22, 3, 11)
+
+local Dropdown = Tab:Dropdown({
+    Title = "select fish",
+    Desc = "Teleport to fish and collect",
+    Values = {"Secret", "Mythical"},
+    Value = "Secret",
+    Callback = function(option)
+        selectedType = option
+    end
+})
+
+local Toggle = Tab:Toggle({
+    Title = "Auto Collect Fish",
+    Desc = "pick up Secret",
+    Value = false,
+    Callback = function(state)
+        tpToggle = state
+
+        task.spawn(function()
+            while tpToggle do
+                task.wait(0.3)
+
+                local char = LocalPlayer.Character
+                if not char or not char:FindFirstChild("HumanoidRootPart") then continue end
+                local hrp = char.HumanoidRootPart
+
+                for _, model in ipairs(workspace:GetDescendants()) do
+                    if not tpToggle then break end
+                    if not model:IsA("Model") then continue end
+
+                    local found = false
+                    for _, gui in ipairs(model:GetDescendants()) do
+                        if gui:IsA("BillboardGui") or gui:IsA("SurfaceGui") then
+                            for _, txt in ipairs(gui:GetDescendants()) do
+                                if (txt:IsA("TextLabel") or txt:IsA("TextButton")) and txt.Text then
+                                    if string.find(string.lower(txt.Text), string.lower(selectedType)) then
+                                        found = true
+                                        break
+                                    end
+                                end
+                            end
+                        end
+                        if found then break end
+                    end
+                    if not found then continue end
+
+                    local part = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart", true)
+                    if not part then continue end
+
+                    hrp.CFrame = part.CFrame * CFrame.new(0, 0, -2)
+                    task.wait(0.3)
+
+                    local prompt = model:FindFirstChildOfClass("ProximityPrompt", true)
+                    if prompt then
+                        fireproximityprompt(prompt)
+                    end
+
+                    task.wait(0.8)
+
+                    hrp.CFrame = returnPos
+                    task.wait(1)
+                end
+            end
+        end)
+    end
+})
+
+local Tab = Window:Tab({
+    Title = "Local Player",
+    Icon = "box", -- optional
+    Locked = false,
+})
+
+local Slider = Tab:Slider({
+    Title = "Jump Power",
+    Desc = "Change Height jump",
+    Step = 1,
+    Value = {
+        Min = 20,
+        Max = 200,
+        Default = 70,
+    },
+    Callback = function(value)
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:WaitForChild("Humanoid")
+
+        humanoid.UseJumpPower = true
+        humanoid.JumpPower = value
+    end
+})
+
+local Slider = Tab:Slider({
+    Title = "Speed",
+    Desc = "Change speed",
+    Step = 1,
+    Value = {
+        Min = 20,
+        Max = 120,
+        Default = 70,
+    },
+    Callback = function(value)
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:WaitForChild("Humanoid")
+
+        humanoid.WalkSpeed = value
+    end
+})
+
+local Button = Tab:Button({
+    Title = "Infinite Yield",
+    Desc = "use iy to fly",
+    Locked = false,
+    Callback = function()
+        -- ...
+        
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+        
+    end
+})
+
+local Tab = Window:Tab({
+    Title = "Teleport",
+    Icon = "diamond", -- optional
+    Locked = false,
+})
+
+local Button = Tab:Button({
+    Title = "teleport secret",
+    Desc = "teleport secret place ",
+    Locked = false,
+    Callback = function()
+        -- ...
+        
+        local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+
+hrp.CFrame = CFrame.new(21, 3, 2775)
+
+        
+    end
+})
+
+local Button = Tab:Button({
+    Title = "teleport mythical",
+    Desc = "teleport mythical place",
+    Locked = false,
+    Callback = function()
+        -- ...
+        
+        local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+
+hrp.CFrame = CFrame.new(-2, 3, 1594)
+
+        
+    end
+})
+
+local Button = Tab:Button({
+    Title = "teleport legendary",
+    Desc = "teleport legendary place",
+    Locked = false,
+    Callback = function()
+        -- ...
+        
+        local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+
+hrp.CFrame = CFrame.new(11, 3, 996)
+
+        
+    end
+})
+
+local Tab = Window:Tab({
+    Title = "Event",
+    Icon = "bird", -- optional
+    Locked = false,
+})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local folder = workspace:WaitForChild("EventCoins")
+
+local tpToggle = false
+
+local Toggle = Tab:Toggle({
+    Title = "Auto collect yin yang Coins",
+    Desc = "Teleport auto collect Event coin",
+    Value = false,
+    Callback = function(state)
+        tpToggle = state
+
+        task.spawn(function()
+            while tpToggle do
+                local char = LocalPlayer.Character
+                if not char or not char:FindFirstChild("HumanoidRootPart") then
+                    task.wait(1)
+                    continue
+                end
+
+                local hrp = char.HumanoidRootPart
+
+                for _, model in ipairs(folder:GetChildren()) do
+                    if not tpToggle then break end
+                    if model:IsA("Model") then
+
+                        local part = model.PrimaryPart
+                            or model:FindFirstChildWhichIsA("BasePart", true)
+
+                        if part then
+
+                            hrp.CFrame = part.CFrame * CFrame.new(0, 0, -2)
+
+                            task.wait(0.3)
+
+                            local prompt = part:FindFirstChildOfClass("ProximityPrompt")
+                            if not prompt then
+                                prompt = model:FindFirstChildOfClass("ProximityPrompt", true)
+                            end
+
+                            if prompt then
+                                fireproximityprompt(prompt)
+                            end
+
+                            task.wait(1)
+                        end
+                    end
+                end
+            end
+        end)
+    end
+})
+
+local Section = Tab:Section({ 
+    Title = "Idk, no idea for Event, please give suggestions on discord",
+})
