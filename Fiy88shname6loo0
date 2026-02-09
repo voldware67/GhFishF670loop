@@ -108,7 +108,7 @@ game.StarterGui:SetCore("SendNotification", {
 })
 
 local Section = Tab:Section({ 
-    Title = "Update added another script and bug fixes",
+    Title = "Update added auto farm",
 })
 
 local Tab = Window:Tab({
@@ -477,6 +477,97 @@ local hrp = char:WaitForChild("HumanoidRootPart")
 hrp.CFrame = CFrame.new(11, 3, 996)
 
         
+    end
+})
+
+local Tab = Window:Tab({
+    Title = "auto farm",
+    Icon = "folder", -- optional
+    Locked = false,
+})
+
+local Players = game:GetService("Players")
+local LP = Players.LocalPlayer
+local Char = LP.Character or LP.CharacterAdded:Wait()
+local HRP = Char:WaitForChild("HumanoidRootPart")
+
+local SelectedPlayer = nil
+local AutoTP = false
+local TPDelay = 1
+
+local function getPlayerNames()
+    local list = {}
+    for _,plr in pairs(Players:GetPlayers()) do
+        table.insert(list, plr.Name)
+    end
+    return list
+end
+
+local function getSlotsFolder()
+    if not SelectedPlayer then return nil end
+    local plot = workspace:FindFirstChild("Plot_" .. SelectedPlayer)
+    if not plot then return nil end
+
+    local floor = plot:FindFirstChild("Floor1")
+    if not floor then return nil end
+
+    return floor:FindFirstChild("Slots")
+end
+
+local function tpToCollect(slot)
+    local part = slot:FindFirstChild("CollectTouch", true)
+    if part and part:IsA("BasePart") then
+        HRP.CFrame = part.CFrame + Vector3.new(0, 3, 0)
+    end
+end
+
+task.spawn(function()
+    while true do
+        task.wait(0.2)
+        if AutoTP then
+            local slots = getSlotsFolder()
+            if slots then
+                for _,slot in ipairs(slots:GetChildren()) do
+                    if not AutoTP then break end
+                    if slot:IsA("Model") then
+                        tpToCollect(slot)
+                        task.wait(TPDelay)
+                    end
+                end
+            else
+                task.wait(1)
+            end
+        end
+    end
+end)
+
+local PlayerDropdown
+PlayerDropdown = Tab:Dropdown({
+    Title = "Select Player Plot",
+    Desc = "select name player",
+    Values = getPlayerNames(),
+    Value = LP.Name,
+    Callback = function(option)
+        SelectedPlayer = option
+    end
+})
+
+SelectedPlayer = LP.Name
+
+local function refreshDropdown()
+    PlayerDropdown:SetValues(getPlayerNames())
+end
+
+Players.PlayerAdded:Connect(refreshDropdown)
+Players.PlayerRemoving:Connect(refreshDropdown)
+
+Tab:Toggle({
+    Title = "Auto Collect money",
+    Desc = "Teleport",
+    Icon = "box",
+    Value = false,
+    Callback = function(state)
+        AutoTP = state
     end
 })
 
